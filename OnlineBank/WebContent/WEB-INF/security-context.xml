@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.3.xsd">
+
+
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource"
+			authorities-by-username-query="select emailaddress,authority from users where emailaddress=?" 
+				users-by-username-query="select emailaddress,password,enabled from users where emailaddress=?"/>
+			<security:password-encoder ref="passwordEncoder" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+	<security:http use-expressions="true">
+
+           
+	      <security:intercept-url pattern="/createaccount"
+			access="permitAll()" />
+			<security:intercept-url pattern="/**"
+			access="isAuthenticated()" />
+
+			<security:form-login
+				authentication-success-forward-url="/home"
+				login-processing-url="/login" />
+			<security:csrf disabled="true" />
+			 <security:logout logout-url="/logout" />
+	</security:http>
+
+	<bean id="passwordEncoder"
+		class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+	</bean>
+
+	
+</beans>
